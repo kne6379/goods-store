@@ -5,7 +5,9 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "format": "prettier --write **/*.js"
+    "format": "prettier --write **/*.js",
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

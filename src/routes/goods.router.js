@@ -1,65 +1,32 @@
 import express from 'express';
-import joi from 'joi';
 import goodsModel from '../schemas/goods.schema.js';
+import { createdGoodsValidator } from '../middlewares/validators/createGoods.validator.middleware.js';
 
 const router = express.Router();
 // validation 및 메세지 정의
-const createdGoodsSchema = joi.object({
-  name: joi.string().required().messages({
-    'string.base': '이름은 문자열이어야 합니다.',
-    'any.required': '이름을 입력해주세요.',
-  }),
-  description: joi.string().required().messages({
-    'string.base': '상품 설명 문자열이어야 합니다.',
-    'any.required': '상품 설명을 입력해주세요.',
-  }),
-  manager: joi.string().required().messages({
-    'string.base': '담당자명은 문자열이어야 합니다.',
-    'any.required': '담당자를 입력해주세요.',
-  }),
-  password: joi.string().min(4).max(10).required().messages({
-    'string.base': '패스워드는 문자열이어야 합니다.',
-    'any.required': '패스워드를 입력해주세요.',
-    'string.min': '패스워드는 최소 4글자여야 합니다.',
-    'string.max': '패스워드는 최대 10글자여야 합니다.',
-  }),
-  status: joi.boolean().messages({
-    'boolean.base': '판매 현황은 boolean으로 입력해주세요',
-  }),
-  passwordCheck: joi.string().optional(),
-});
 
 // 상품 생성 API
-router.post('/goods', async (req, res, next) => {
+router.post('/goods', createdGoodsValidator, async (req, res, next) => {
   try {
-    const validation = await createdGoodsSchema.validateAsync(req.body);
-    const {
-      name,
-      description,
-      manager,
-      password,
-      createdAt,
-      updatedAt,
-      GoodsStatus,
-    } = validation;
+    const { name, description, manager, password } = req.body;
     const duplicationName = await goodsModel.findOne({ name });
     if (duplicationName) {
-      throw new Error('이미 등록된 상품입니다.');
+      return res
+        .status(400)
+        .json({ status: res.statusCode, message: '이미 등록된 상품입니다.' });
     }
-    const goods = new goodsModel({
+    const goodsData = new goodsModel({
       name,
       description,
       manager,
       password,
-      status: GoodsStatus,
-      createdAt,
-      updatedAt,
     });
-    await goods.save();
+    let goods = await goodsData.save();
+    goods = { ...goods.toJSON(), password: undefined };
     return res.status(201).json({
       status: res.statusCode,
       message: '새로운 상품이 등록되었습니다.',
-      goods: goods,
+      goods,
     });
   } catch (error) {
     next(error);

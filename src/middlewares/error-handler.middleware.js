@@ -1,10 +1,8 @@
 export default (err, req, res, next) => {
   console.log('에러처리 미들웨어가 실행되었습니다.');
-  console.log(err.name);
+
   console.error(err);
-  if (err) {
-    return res.status(400).json({ errorMessage: err.message });
-  }
+
   if (err.name === 'ValidationError') {
     return res.status(400).json({ errorMessage: err.message });
   }
