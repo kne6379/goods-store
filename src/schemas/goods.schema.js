@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import { GOODS_STATUS } from '../constants/product.constant.js';
+import mongoose from "mongoose";
+import { GOODS_STATUS } from "../constants/goods.constant.js";
 
 const goodsSchema = new mongoose.Schema(
   {
@@ -34,4 +34,4 @@ const goodsSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model('goodsModel', goodsSchema);
+export default mongoose.model("goodsModel", goodsSchema);
